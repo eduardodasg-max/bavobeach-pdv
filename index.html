@@ -1,4 +1,3 @@
-﻿
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,159 +7,233 @@
 <link rel="manifest" href="manifest.json">
 <title>BavoBeach PDV</title>
 <style>
+:root{--navy:#102d46;--teal:#13a89e;--bg:#f0f6f8;--muted:#6b7e8b;--line:#dce7eb;--red:#b42318}
 *{box-sizing:border-box}
-body{margin:0;background:#f0f6f8;color:#102d46;font-family:Arial,sans-serif}
-header{background:#102d46;color:white;padding:22px}
-header h1{margin:0}
-header p{color:#bfe9e7;margin-bottom:0}
-main{max-width:700px;margin:auto;padding:16px}
-.card{background:white;border-radius:14px;padding:18px;margin-bottom:14px}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:Arial,sans-serif}
+header{background:var(--navy);color:#fff;padding:20px 16px}
+header h1{margin:0;font-size:25px} header p{color:#bfe9e7;margin:6px 0}
+main{max-width:980px;margin:auto;padding:16px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+button,.button{border:0;border-radius:8px;padding:11px 14px;font-size:15px;font-weight:bold;cursor:pointer;background:var(--teal);color:white}
+nav button{background:#dcebea;color:var(--navy);flex:1;min-width:105px}
+nav button.active{background:var(--teal);color:#fff}
+.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px #102d460d}
+h2{margin:0 0 14px;font-size:21px} h3{margin:14px 0 8px}
 label{display:block;font-size:13px;font-weight:bold;margin:12px 0 5px}
-input,select,button{width:100%;padding:12px;border-radius:8px;font-size:16px}
-input,select{border:1px solid #dce7eb;background:white}
-button{border:0;background:#13a89e;color:white;font-weight:bold;margin-top:12px}
-nav{display:flex;gap:8px;margin-bottom:14px}
-nav button{background:#dcebea;color:#102d46}
-nav button.active{background:#13a89e;color:white}
-.metric{font-size:24px;font-weight:bold}
-.order{border-top:1px solid #dce7eb;padding:12px 0}
-small{color:#708492}
+input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--navy);font-size:16px}
+button.secondary{background:#e4eef1;color:var(--navy)} button.danger{background:var(--red)} button.small{padding:7px 9px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.metric{background:#f0f8f7;border-radius:10px;padding:12px}
+.metric span{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.metric strong{font-size:21px}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1;min-width:0}
+.item{border-top:1px solid var(--line);padding:12px 0}
+.item:first-child{border-top:0}
+.item p{margin:5px 0}
+.muted,small{color:var(--muted)}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.notice{padding:12px;border-radius:8px;background:#fff4d6;color:#704b00;font-size:14px;line-height:1.4}
+.empty{color:var(--muted);padding:12px 0}
+.hidden{display:none!important}
+@media(max-width:620px){.grid,.metrics{grid-template-columns:1fr}.row{align-items:stretch;flex-direction:column}main{padding:10px}.card{padding:14px}header{padding:18px 14px}}
 </style>
 </head>
 <body>
 <header>
-<h1>🌊 BavoBeach</h1>
-<p>PDV · Gestão do quiosque</p>
-<small id="status" style="color:#bfe9e7">Preparando aplicativo...</small>
+  <h1>🌊 BavoBeach</h1>
+  <p>PDV · Gestão do quiosque</p>
+  <small id="status" style="color:#bfe9e7">Sistema local</small>
 </header>
 <main>
 <nav>
-<button class="active" data-page="novo">Novo pedido</button>
-<button data-page="pedidos">Pedidos</button>
-<button data-page="resumo">Resumo</button>
+  <button class="active" data-page="pedido">Novo pedido</button>
+  <button data-page="pedidos">Pedidos</button>
+  <button data-page="produtos">Produtos</button>
+  <button data-page="garcons">Garçons</button>
+  <button data-page="caixa">Fechamento de caixa</button>
 </nav>
 
-<section id="novo">
+<section id="pedido">
 <div class="card">
 <h2>Novo pedido</h2>
-<form id="form">
-<label>Garçom</label>
-<input id="garcom" required placeholder="Nome do garçom">
-<label>Local</label>
-<select id="local">
-<option>Mesa</option>
-<option>Cadeira de praia</option>
-<option>Comanda</option>
-</select>
-<label>Número ou identificação</label>
-<input id="numero" required placeholder="Ex.: 12">
-<label>Produto</label>
-<input id="produto" required placeholder="Ex.: Água de coco">
-<label>Quantidade</label>
-<input id="qtd" type="number" min="1" value="1" required>
-<label>Preço unitário (R$)</label>
-<input id="preco" type="number" min="0" step=".01" required placeholder="10.00">
-<label>Pagamento</label>
-<select id="pagamento">
-<option>Pendente</option>
-<option>Pix</option>
-<option>Dinheiro</option>
-<option>Cartão de crédito/débito</option>
-</select>
-<button type="submit">Registrar pedido</button>
+<form id="formPedido">
+  <div class="grid">
+    <div><label for="garcomPedido">Garçom</label><select id="garcomPedido" required></select></div>
+    <div><label for="local">Local</label><select id="local"><option>Mesa</option><option>Cadeira de praia</option><option>Comanda</option></select></div>
+    <div><label for="numero">Número ou identificação</label><input id="numero" required placeholder="Ex.: 12"></div>
+    <div><label for="produtoPedido">Produto</label><select id="produtoPedido" required></select></div>
+    <div><label for="qtd">Quantidade</label><input id="qtd" type="number" min="1" step="1" value="1" required></div>
+    <div><label for="precoPedido">Preço unitário (R$)</label><input id="precoPedido" type="number" min="0" step="0.01" required></div>
+    <div><label for="pagamento">Pagamento</label><select id="pagamento"><option>Pendente</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option></select></div>
+  </div>
+  <button type="submit">Registrar pedido</button>
 </form>
 </div>
+<div class="notice">Esta versão guarda dados apenas neste navegador/aparelho. Faça backups regularmente. Ainda não sincroniza pedidos entre celulares nem possui login seguro.</div>
 </section>
 
 <section id="pedidos" hidden>
-<div class="card">
-<h2>Pedidos</h2>
-<div id="lista"></div>
+<div class="card"><h2>Pedidos registrados</h2>
+<div class="grid">
+ <div><label for="filtroData">Filtrar por data</label><input id="filtroData" type="date"></div>
+ <div><label for="filtroStatus">Filtrar pagamento</label><select id="filtroStatus"><option value="">Todos</option><option>Pendente</option><option>Pix</option><option>Dinheiro</option><option>Cartão de crédito</option><option>Cartão de débito</option></select></div>
+</div>
+<div id="listaPedidos"></div>
 </div>
 </section>
 
-<section id="resumo" hidden>
-<div class="card">
-<h2>Resumo local</h2>
-<p>Pedidos registrados</p>
-<div class="metric" id="totalPedidos">0</div>
-<p>Vendas marcadas como pagas</p>
-<div class="metric" id="totalVendas">R$ 0,00</div>
-<p><small>Os valores são apenas os registrados neste aparelho.</small></p>
-<button id="exportar" type="button">Exportar backup</button>
+<section id="produtos" hidden>
+<div class="card"><h2>Cadastro de produtos e preços</h2>
+<form id="formProduto">
+ <input id="produtoId" type="hidden">
+ <div class="grid">
+  <div><label for="nomeProduto">Nome do produto</label><input id="nomeProduto" required placeholder="Ex.: Água de coco"></div>
+  <div><label for="precoProduto">Preço de venda (R$)</label><input id="precoProduto" type="number" min="0" step="0.01" required placeholder="10,00"></div>
+ </div>
+ <div class="row"><button type="submit" id="salvarProduto">Cadastrar produto</button><button class="secondary" type="button" id="cancelarProduto">Limpar</button></div>
+</form>
+<h3>Produtos cadastrados</h3><div id="listaProdutos"></div>
 </div>
-<div class="card">
-<strong>Limites desta versão</strong>
-<p>Não há login seguro, sincronização entre aparelhos ou autorização real de garçons. Não use para controlar o caixa oficial.</p>
+</section>
+
+<section id="garcons" hidden>
+<div class="card"><h2>Controle de garçons</h2>
+<form id="formGarcom">
+ <input id="garcomId" type="hidden">
+ <div class="row">
+  <div><label for="nomeGarcom">Nome do garçom</label><input id="nomeGarcom" required placeholder="Nome completo"></div>
+  <div><label for="statusGarcom">Situação</label><select id="statusGarcom"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></div>
+ </div>
+ <div class="row"><button type="submit" id="salvarGarcom">Cadastrar garçom</button><button class="secondary" type="button" id="cancelarGarcom">Limpar</button></div>
+</form>
+<h3>Equipe cadastrada</h3><div id="listaGarcons"></div>
 </div>
+</section>
+
+<section id="caixa" hidden>
+<div class="card"><h2>Fechamento de caixa</h2>
+<div class="grid">
+ <div><label for="dataCaixa">Data do caixa</label><input id="dataCaixa" type="date"></div>
+ <div><label for="responsavelCaixa">Responsável pelo fechamento</label><input id="responsavelCaixa" placeholder="Nome do responsável"></div>
+</div>
+<div class="metrics" style="margin:14px 0">
+ <div class="metric"><span>Pedidos do dia</span><strong id="cxPedidos">0</strong></div>
+ <div class="metric"><span>Recebido (pagos)</span><strong id="cxRecebido">R$ 0,00</strong></div>
+ <div class="metric"><span>Em aberto</span><strong id="cxPendente">R$ 0,00</strong></div>
+</div>
+<h3>Recebimentos por forma de pagamento</h3><div id="cxFormas"></div>
+<h3>Totais por garçom (pedidos pagos)</h3><div id="cxGarcons"></div>
+<label for="observacaoCaixa">Observações</label><input id="observacaoCaixa" placeholder="Diferenças, ocorrências etc.">
+<button id="fecharCaixa" type="button">Salvar fechamento do dia</button>
+<button class="secondary" id="exportar" type="button">Exportar backup de todos os dados</button>
+<h3>Fechamentos salvos</h3><div id="listaFechamentos"></div>
+</div>
+<div class="notice">O fechamento é um relatório dos pedidos marcados como pagos. Confira os valores com o dinheiro e os comprovantes reais antes de encerrar o caixa.</div>
 </section>
 </main>
-
 <script>
-const KEY="bavobeach-pedidos-v1";
-let pedidos=[];
-try{pedidos=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){}
-const dinheiro=n=>Number(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function salvar(){
-localStorage.setItem(KEY,JSON.stringify(pedidos));
-render();
+const KEYS={pedidos:"bavobeach-pedidos-v2",produtos:"bavobeach-produtos-v1",garcons:"bavobeach-garcons-v1",fechamentos:"bavobeach-fechamentos-v1"};
+const read=(key,fallback=[])=>{try{const v=JSON.parse(localStorage.getItem(key)||"null");return Array.isArray(v)?v:fallback}catch(e){return fallback}};
+let pedidos=read(KEYS.pedidos);
+if(!pedidos.length){
+  // Migra pedidos da primeira versão sem apagar o armazenamento antigo.
+  try {
+    const antigos=JSON.parse(localStorage.getItem("bavobeach-pedidos-v1")||"[]");
+    if(Array.isArray(antigos) && antigos.length){
+      pedidos=antigos.map((p,i)=>({
+        ...p,
+        id:p.id||("pedido-antigo-"+i),
+        data:p.data||new Date().toISOString(),
+        garcomNome:p.garcomNome||p.garcom||"Garçom não identificado"
+      }));
+      localStorage.setItem(KEYS.pedidos,JSON.stringify(pedidos));
+    }
+  } catch(e) {}
 }
-function render(){
-document.getElementById("totalPedidos").textContent=pedidos.length;
-document.getElementById("totalVendas").textContent=dinheiro(
-pedidos.filter(p=>p.pagamento!=="Pendente").reduce((s,p)=>s+p.total,0));
-document.getElementById("lista").innerHTML=pedidos.length?pedidos.map(p=>`
-<div class="order">
-<strong>${esc(p.local)} ${esc(p.numero)}</strong>
-<p>${esc(p.produto)} × ${p.qtd}</p>
-<p>Garçom: ${esc(p.garcom)}</p>
-<p>Pagamento: ${esc(p.pagamento)}</p>
-<strong>${dinheiro(p.total)}</strong>
-</div>`).join(""):"Nenhum pedido registrado.";
+let produtos=read(KEYS.produtos);
+let garcons=read(KEYS.garcons);
+let fechamentos=read(KEYS.fechamentos);
+const hoje=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const dinheiro=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dataPedido=p=>(p.data||"").slice(0,10);
+function saveAll(){localStorage.setItem(KEYS.pedidos,JSON.stringify(pedidos));localStorage.setItem(KEYS.produtos,JSON.stringify(produtos));localStorage.setItem(KEYS.garcons,JSON.stringify(garcons));localStorage.setItem(KEYS.fechamentos,JSON.stringify(fechamentos));}
+function options(select,items,placeholder){const old=select.value;select.innerHTML=placeholder?`<option value="">${esc(placeholder)}</option>`:"";items.forEach(i=>{const o=document.createElement("option");o.value=i.id;o.textContent=i.nome;select.appendChild(o)});if(items.some(i=>i.id===old))select.value=old;}
+function refreshSelects(){
+ const ativos=garcons.filter(g=>g.status==="ativo");
+ options(document.getElementById("garcomPedido"),ativos,"Selecione o garçom");
+ options(document.getElementById("produtoPedido"),produtos,"Selecione o produto");
+ if(!produtos.length)document.getElementById("produtoPedido").innerHTML='<option value="">Cadastre um produto primeiro</option>';
 }
-document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{
-document.querySelectorAll("main section").forEach(s=>s.hidden=true);
-document.getElementById(b.dataset.page).hidden=false;
-document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
-b.classList.add("active");
-render();
-});
-document.getElementById("form").onsubmit=e=>{
-e.preventDefault();
-const qtd=Number(document.getElementById("qtd").value);
-const preco=Number(document.getElementById("preco").value);
-if(qtd<=0||preco<0||!Number.isFinite(qtd)||!Number.isFinite(preco))return;
-pedidos.unshift({
-id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
-garcom:document.getElementById("garcom").value.trim(),
-local:document.getElementById("local").value,
-numero:document.getElementById("numero").value.trim(),
-produto:document.getElementById("produto").value.trim(),
-qtd,preco,total:qtd*preco,
-pagamento:document.getElementById("pagamento").value
-});
-salvar();
-e.target.reset();
-document.getElementById("qtd").value=1;
-alert("Pedido registrado neste aparelho.");
-};
-document.getElementById("exportar").onclick=()=>{
-const blob=new Blob([JSON.stringify(pedidos,null,2)],{type:"application/json"});
-const a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="bavobeach-backup.json";
-a.click();
-URL.revokeObjectURL(a.href);
-};
-if("serviceWorker" in navigator && location.protocol.startsWith("http")){
-navigator.serviceWorker.register("./sw.js").then(()=>{
-document.getElementById("status").textContent="Aplicativo preparado";
-}).catch(()=>{
-document.getElementById("status").textContent="Modo navegador";
-});
+function renderProdutos(){
+ const el=document.getElementById("listaProdutos");
+ el.innerHTML=produtos.length?produtos.map(p=>`<div class="item"><div class="row"><div><strong>${esc(p.nome)}</strong><p>${dinheiro(p.preco)}</p></div><div class="actions"><button class="secondary small" onclick="editarProduto('${p.id}')">Editar</button><button class="danger small" onclick="excluirProduto('${p.id}')">Excluir</button></div></div></div>`).join(""):'<div class="empty">Nenhum produto cadastrado.</div>';
 }
-render();
+function renderGarcons(){
+ const el=document.getElementById("listaGarcons");
+ el.innerHTML=garcons.length?garcons.map(g=>`<div class="item"><div class="row"><div><strong>${esc(g.nome)}</strong><p>${g.status==="ativo"?"Ativo":"Inativo"}</p></div><div class="actions"><button class="secondary small" onclick="editarGarcom('${g.id}')">Editar</button><button class="danger small" onclick="excluirGarcom('${g.id}')">Excluir</button></div></div></div>`).join(""):'<div class="empty">Cadastre os garçons para aparecerem no formulário de pedidos.</div>';
+}
+function renderPedidos(){
+ const date=document.getElementById("filtroData").value, status=document.getElementById("filtroStatus").value;
+ const arr=pedidos.filter(p=>(!date||dataPedido(p)===date)&&(!status||p.pagamento===status));
+ document.getElementById("listaPedidos").innerHTML=arr.length?arr.map(p=>`<div class="item"><strong>${esc(p.local)} ${esc(p.numero)}</strong><p>${esc(p.produto)} × ${p.qtd} — ${dinheiro(p.total)}</p><p>Garçom: ${esc(p.garcomNome||p.garcom||"—")} · Pagamento: <strong>${esc(p.pagamento)}</strong></p><small>${new Date(p.data||Date.now()).toLocaleString("pt-BR")}</small><div class="actions">${p.pagamento==="Pendente"?`<button class="small" onclick="marcarPago('${p.id}')">Marcar como pago</button>`:""}<button class="danger small" onclick="excluirPedido('${p.id}')">Excluir pedido</button></div></div>`).join(""):'<div class="empty">Nenhum pedido encontrado com esses filtros.</div>';
+}
+function resumoCaixa(){
+ const date=document.getElementById("dataCaixa").value||hoje();
+ const dia=pedidos.filter(p=>dataPedido(p)===date);
+ const pagos=dia.filter(p=>p.pagamento!=="Pendente");
+ const pendentes=dia.filter(p=>p.pagamento==="Pendente");
+ document.getElementById("cxPedidos").textContent=dia.length;
+ document.getElementById("cxRecebido").textContent=dinheiro(pagos.reduce((s,p)=>s+Number(p.total),0));
+ document.getElementById("cxPendente").textContent=dinheiro(pendentes.reduce((s,p)=>s+Number(p.total),0));
+ const formas=["Pix","Dinheiro","Cartão de crédito","Cartão de débito"];
+ document.getElementById("cxFormas").innerHTML=formas.map(f=>`<div class="item row"><span>${f}</span><strong>${dinheiro(pagos.filter(p=>p.pagamento===f).reduce((s,p)=>s+Number(p.total),0))}</strong></div>`).join("");
+ const nomes=[...new Set(pagos.map(p=>p.garcomNome||p.garcom||"Sem garçom"))];
+ document.getElementById("cxGarcons").innerHTML=nomes.length?nomes.map(n=>`<div class="item row"><span>${esc(n)}</span><strong>${dinheiro(pagos.filter(p=>(p.garcomNome||p.garcom||"Sem garçom")===n).reduce((s,p)=>s+Number(p.total),0))}</strong></div>`).join(""):'<div class="empty">Nenhum pedido pago neste dia.</div>';
+ const saves=fechamentos.filter(f=>f.data===date);
+ document.getElementById("listaFechamentos").innerHTML=saves.length?saves.map(f=>`<div class="item"><strong>${esc(f.data)}</strong> — ${dinheiro(f.recebido)}<p>Responsável: ${esc(f.responsavel||"Não informado")}</p><p>${esc(f.observacao||"Sem observações")}</p></div>`).join(""):'<div class="empty">Nenhum fechamento salvo para esta data.</div>';
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll("main section").forEach(s=>s.hidden=true);
+ document.getElementById(b.dataset.page).hidden=false;
+ document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));
+ renderPedidos();resumoCaixa();
+}));
+document.getElementById("formProduto").addEventListener("submit",e=>{
+ e.preventDefault();const id=document.getElementById("produtoId").value;const nome=document.getElementById("nomeProduto").value.trim();const preco=Number(document.getElementById("precoProduto").value);
+ if(!nome||!Number.isFinite(preco)||preco<0)return alert("Confira o nome e o preço.");
+ if(id){produtos=produtos.map(p=>p.id===id?{...p,nome,preco}:p)}else produtos.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),nome,preco});
+ saveAll();e.target.reset();document.getElementById("produtoId").value="";document.getElementById("salvarProduto").textContent="Cadastrar produto";renderProdutos();refreshSelects();
+});
+window.editarProduto=id=>{const p=produtos.find(x=>x.id===id);if(!p)return;document.getElementById("produtoId").value=id;document.getElementById("nomeProduto").value=p.nome;document.getElementById("precoProduto").value=p.preco;document.getElementById("salvarProduto").textContent="Salvar alterações";document.getElementById("nomeProduto").focus()};
+window.excluirProduto=id=>{if(!confirm("Excluir este produto do cadastro? Pedidos antigos serão mantidos."))return;produtos=produtos.filter(p=>p.id!==id);saveAll();renderProdutos();refreshSelects()};
+document.getElementById("cancelarProduto").onclick=()=>{document.getElementById("formProduto").reset();document.getElementById("produtoId").value="";document.getElementById("salvarProduto").textContent="Cadastrar produto"};
+document.getElementById("formGarcom").addEventListener("submit",e=>{
+ e.preventDefault();const id=document.getElementById("garcomId").value;const nome=document.getElementById("nomeGarcom").value.trim();const status=document.getElementById("statusGarcom").value;if(!nome)return;
+ if(id){garcons=garcons.map(g=>g.id===id?{...g,nome,status}:g)}else garcons.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),nome,status});
+ saveAll();e.target.reset();document.getElementById("garcomId").value="";document.getElementById("salvarGarcom").textContent="Cadastrar garçom";renderGarcons();refreshSelects();
+});
+window.editarGarcom=id=>{const g=garcons.find(x=>x.id===id);if(!g)return;document.getElementById("garcomId").value=id;document.getElementById("nomeGarcom").value=g.nome;document.getElementById("statusGarcom").value=g.status;document.getElementById("salvarGarcom").textContent="Salvar alterações";document.getElementById("nomeGarcom").focus()};
+window.excluirGarcom=id=>{if(!confirm("Excluir este garçom? Os pedidos antigos serão mantidos."))return;garcons=garcons.filter(g=>g.id!==id);saveAll();renderGarcons();refreshSelects()};
+document.getElementById("cancelarGarcom").onclick=()=>{document.getElementById("formGarcom").reset();document.getElementById("garcomId").value="";document.getElementById("salvarGarcom").textContent="Cadastrar garçom"};
+document.getElementById("produtoPedido").addEventListener("change",()=>{const p=produtos.find(p=>p.id===document.getElementById("produtoPedido").value);if(p)document.getElementById("precoPedido").value=Number(p.preco).toFixed(2)});
+document.getElementById("formPedido").addEventListener("submit",e=>{
+ e.preventDefault();const garcom=garcons.find(g=>g.id===document.getElementById("garcomPedido").value);const produto=produtos.find(p=>p.id===document.getElementById("produtoPedido").value);
+ const qtd=Number(document.getElementById("qtd").value),preco=Number(document.getElementById("precoPedido").value);
+ if(!garcom)return alert("Cadastre e selecione um garçom ativo.");if(!produto)return alert("Cadastre e selecione um produto.");if(!Number.isInteger(qtd)||qtd<1||!Number.isFinite(preco)||preco<0)return alert("Confira a quantidade e o preço.");
+ pedidos.unshift({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),data:new Date().toISOString(),garcomId:garcom.id,garcomNome:garcom.nome,local:document.getElementById("local").value,numero:document.getElementById("numero").value.trim(),produtoId:produto.id,produto:produto.nome,qtd,preco,total:qtd*preco,pagamento:document.getElementById("pagamento").value});
+ saveAll();e.target.reset();document.getElementById("qtd").value=1;refreshSelects();alert("Pedido registrado neste aparelho.");renderPedidos();resumoCaixa();
+});
+window.marcarPago=id=>{const p=pedidos.find(p=>p.id===id);if(!p)return;const metodo=prompt("Forma de pagamento: Pix, Dinheiro, Cartão de crédito ou Cartão de débito", "Pix");if(metodo===null)return;const valid=["Pix","Dinheiro","Cartão de crédito","Cartão de débito"];if(!valid.includes(metodo.trim()))return alert("Digite uma das opções exatamente: "+valid.join(", "));p.pagamento=metodo.trim();saveAll();renderPedidos();resumoCaixa()};
+window.excluirPedido=id=>{if(!confirm("Tem certeza que deseja excluir este pedido?"))return;pedidos=pedidos.filter(p=>p.id!==id);saveAll();renderPedidos();resumoCaixa()};
+document.getElementById("filtroData").value=hoje();document.getElementById("filtroData").addEventListener("change",renderPedidos);document.getElementById("filtroStatus").addEventListener("change",renderPedidos);
+document.getElementById("dataCaixa").value=hoje();document.getElementById("dataCaixa").addEventListener("change",resumoCaixa);
+document.getElementById("fecharCaixa").onclick=()=>{const date=document.getElementById("dataCaixa").value||hoje();const dia=pedidos.filter(p=>dataPedido(p)===date);const pagos=dia.filter(p=>p.pagamento!=="Pendente");const recebido=pagos.reduce((s,p)=>s+Number(p.total),0);if(!confirm(`Salvar fechamento de ${date} com ${dia.length} pedidos e ${dinheiro(recebido)} recebidos?`))return;fechamentos.unshift({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),data:date,responsavel:document.getElementById("responsavelCaixa").value.trim(),observacao:document.getElementById("observacaoCaixa").value.trim(),pedidos:dia.length,recebido,pendente:dia.filter(p=>p.pagamento==="Pendente").reduce((s,p)=>s+Number(p.total),0),criadoEm:new Date().toISOString()});saveAll();resumoCaixa();alert("Fechamento salvo neste aparelho.")};
+document.getElementById("exportar").onclick=()=>{const blob=new Blob([JSON.stringify({exportadoEm:new Date().toISOString(),pedidos,produtos,garcons,fechamentos},null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="bavobeach-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+function migrateOldOrders(){/* Pedidos antigos permanecem no armazenamento v1; importação manual pode ser feita via backup. */}
+function renderAll(){refreshSelects();renderProdutos();renderGarcons();renderPedidos();resumoCaixa();document.getElementById("status").textContent="Sistema pronto · dados salvos neste aparelho";}
+renderAll();
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
 </script>
 </body>
 </html>

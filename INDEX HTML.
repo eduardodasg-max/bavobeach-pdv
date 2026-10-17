@@ -1,0 +1,166 @@
+﻿
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102d46">
+<link rel="manifest" href="manifest.json">
+<title>BavoBeach PDV</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f0f6f8;color:#102d46;font-family:Arial,sans-serif}
+header{background:#102d46;color:white;padding:22px}
+header h1{margin:0}
+header p{color:#bfe9e7;margin-bottom:0}
+main{max-width:700px;margin:auto;padding:16px}
+.card{background:white;border-radius:14px;padding:18px;margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:bold;margin:12px 0 5px}
+input,select,button{width:100%;padding:12px;border-radius:8px;font-size:16px}
+input,select{border:1px solid #dce7eb;background:white}
+button{border:0;background:#13a89e;color:white;font-weight:bold;margin-top:12px}
+nav{display:flex;gap:8px;margin-bottom:14px}
+nav button{background:#dcebea;color:#102d46}
+nav button.active{background:#13a89e;color:white}
+.metric{font-size:24px;font-weight:bold}
+.order{border-top:1px solid #dce7eb;padding:12px 0}
+small{color:#708492}
+</style>
+</head>
+<body>
+<header>
+<h1>🌊 BavoBeach</h1>
+<p>PDV · Gestão do quiosque</p>
+<small id="status" style="color:#bfe9e7">Preparando aplicativo...</small>
+</header>
+<main>
+<nav>
+<button class="active" data-page="novo">Novo pedido</button>
+<button data-page="pedidos">Pedidos</button>
+<button data-page="resumo">Resumo</button>
+</nav>
+
+<section id="novo">
+<div class="card">
+<h2>Novo pedido</h2>
+<form id="form">
+<label>Garçom</label>
+<input id="garcom" required placeholder="Nome do garçom">
+<label>Local</label>
+<select id="local">
+<option>Mesa</option>
+<option>Cadeira de praia</option>
+<option>Comanda</option>
+</select>
+<label>Número ou identificação</label>
+<input id="numero" required placeholder="Ex.: 12">
+<label>Produto</label>
+<input id="produto" required placeholder="Ex.: Água de coco">
+<label>Quantidade</label>
+<input id="qtd" type="number" min="1" value="1" required>
+<label>Preço unitário (R$)</label>
+<input id="preco" type="number" min="0" step=".01" required placeholder="10.00">
+<label>Pagamento</label>
+<select id="pagamento">
+<option>Pendente</option>
+<option>Pix</option>
+<option>Dinheiro</option>
+<option>Cartão de crédito/débito</option>
+</select>
+<button type="submit">Registrar pedido</button>
+</form>
+</div>
+</section>
+
+<section id="pedidos" hidden>
+<div class="card">
+<h2>Pedidos</h2>
+<div id="lista"></div>
+</div>
+</section>
+
+<section id="resumo" hidden>
+<div class="card">
+<h2>Resumo local</h2>
+<p>Pedidos registrados</p>
+<div class="metric" id="totalPedidos">0</div>
+<p>Vendas marcadas como pagas</p>
+<div class="metric" id="totalVendas">R$ 0,00</div>
+<p><small>Os valores são apenas os registrados neste aparelho.</small></p>
+<button id="exportar" type="button">Exportar backup</button>
+</div>
+<div class="card">
+<strong>Limites desta versão</strong>
+<p>Não há login seguro, sincronização entre aparelhos ou autorização real de garçons. Não use para controlar o caixa oficial.</p>
+</div>
+</section>
+</main>
+
+<script>
+const KEY="bavobeach-pedidos-v1";
+let pedidos=[];
+try{pedidos=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){}
+const dinheiro=n=>Number(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function salvar(){
+localStorage.setItem(KEY,JSON.stringify(pedidos));
+render();
+}
+function render(){
+document.getElementById("totalPedidos").textContent=pedidos.length;
+document.getElementById("totalVendas").textContent=dinheiro(
+pedidos.filter(p=>p.pagamento!=="Pendente").reduce((s,p)=>s+p.total,0));
+document.getElementById("lista").innerHTML=pedidos.length?pedidos.map(p=>`
+<div class="order">
+<strong>${esc(p.local)} ${esc(p.numero)}</strong>
+<p>${esc(p.produto)} × ${p.qtd}</p>
+<p>Garçom: ${esc(p.garcom)}</p>
+<p>Pagamento: ${esc(p.pagamento)}</p>
+<strong>${dinheiro(p.total)}</strong>
+</div>`).join(""):"Nenhum pedido registrado.";
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{
+document.querySelectorAll("main section").forEach(s=>s.hidden=true);
+document.getElementById(b.dataset.page).hidden=false;
+document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+b.classList.add("active");
+render();
+});
+document.getElementById("form").onsubmit=e=>{
+e.preventDefault();
+const qtd=Number(document.getElementById("qtd").value);
+const preco=Number(document.getElementById("preco").value);
+if(qtd<=0||preco<0||!Number.isFinite(qtd)||!Number.isFinite(preco))return;
+pedidos.unshift({
+id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+garcom:document.getElementById("garcom").value.trim(),
+local:document.getElementById("local").value,
+numero:document.getElementById("numero").value.trim(),
+produto:document.getElementById("produto").value.trim(),
+qtd,preco,total:qtd*preco,
+pagamento:document.getElementById("pagamento").value
+});
+salvar();
+e.target.reset();
+document.getElementById("qtd").value=1;
+alert("Pedido registrado neste aparelho.");
+};
+document.getElementById("exportar").onclick=()=>{
+const blob=new Blob([JSON.stringify(pedidos,null,2)],{type:"application/json"});
+const a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="bavobeach-backup.json";
+a.click();
+URL.revokeObjectURL(a.href);
+};
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+navigator.serviceWorker.register("./sw.js").then(()=>{
+document.getElementById("status").textContent="Aplicativo preparado";
+}).catch(()=>{
+document.getElementById("status").textContent="Modo navegador";
+});
+}
+render();
+</script>
+</body>
+</html>

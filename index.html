@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#102d46">
-<title>BravoBeach PDV · Estoque Integrado</title>
+<title>BravoBeach PDV · Estoque Crítico</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f0f6f8;color:#102d46;font-family:Arial,sans-serif}
@@ -48,7 +48,9 @@ button.danger{background:#e74c3c}
 .prod-item-btn.esgotado:hover{background:#f0f2f5;border-color:#dce7eb}
 .prod-item-btn strong{font-size:13px;display:block;margin-bottom:4px;color:#102d46}
 .prod-item-btn span{font-size:12px;color:#13a89e;font-weight:bold}
-.prod-item-btn small{font-size:11px;color:#708492;margin-top:4px}
+.prod-item-btn small{font-size:11px;color:#708492;margin-top:4px;font-weight:bold;padding:2px 4px;border-radius:4px}
+.prod-item-btn small.critico{background:#ffeaa7;color:#d63031}
+.prod-item-btn small.normal{color:#708492}
 
 /* Itens da Conta / Consumo */
 .item-consumo{display:flex;justify-content:between;align-items:center;padding:8px 0;border-bottom:1px dashed #dce7eb}
@@ -67,7 +69,7 @@ th{background:#f0f6f8;font-size:13px}
 <header>
 <div>
 <h1>🌊 BravoBeach</h1>
-<p>PDV · Gestão de Quiosque & Mesas com Controle de Estoque</p>
+<p>PDV · Gestão de Quiosque & Mesas com Controle Crítico</p>
 </div>
 </header>
 
@@ -102,9 +104,7 @@ th{background:#f0f6f8;font-size:13px}
 <button class="aba-cat" id="btn-cat-sem-alcool" onclick="filtrarProdutosMenu('sem alcool')">Sem Álcool</button>
 </div>
 
-<div class="grid-produtos-botoes" id="menu-produtos-botoes">
-<!-- Botões gerados via JS -->
-</div>
+<div class="grid-produtos-botoes" id="menu-produtos-botoes"></div>
 <button type="button" class="danger" style="margin-top:20px" onclick="cancelarMesaInteira()">🚫 Cancelar/Zerar Mesa</button>
 </div>
 
@@ -151,7 +151,6 @@ th{background:#f0f6f8;font-size:13px}
 
 <!-- ABA 2: CONFIGURAÇÕES -->
 <section id="sec-config" style="display:none">
-<!-- Senha do Sistema -->
 <div class="card">
 <h2>Segurança</h2>
 <label>Senha Master de Cancelamento</label>
@@ -159,7 +158,6 @@ th{background:#f0f6f8;font-size:13px}
 <button onclick="salvarSenha()" style="margin-top:8px">Salvar Nova Senha</button>
 </div>
 
-<!-- Cadastro de Garçons -->
 <div class="card">
 <h2>Gerenciar Garçons</h2>
 <form id="form-garcom" onsubmit="event.preventDefault(); cadastrarGarcom();">
@@ -173,7 +171,6 @@ th{background:#f0f6f8;font-size:13px}
 </table>
 </div>
 
-<!-- Cadastro de Produtos -->
 <div class="card">
 <h2>Gerenciar Produtos e Estoque</h2>
 <form id="form-produto" onsubmit="event.preventDefault(); cadastrarProduto();">
@@ -189,7 +186,7 @@ th{background:#f0f6f8;font-size:13px}
 <label>Preço Unitário (R$)</label>
 <input id="new-prod-preco" type="number" min="0" step="0.01" required placeholder="12.00">
 <label>Quantidade Inicial em Estoque</label>
-<input id="new-prod-estoque" type="number" min="0" value="50" required placeholder="Ex: 50">
+<input id="new-prod-estoque" type="number" min="0" value="50" required>
 <button type="submit">Adicionar Produto</button>
 </form>
 <table>
@@ -198,7 +195,6 @@ th{background:#f0f6f8;font-size:13px}
 </table>
 </div>
 
-<!-- Reset de Dados -->
 <div class="card">
 <h2>Configurações do Layout</h2>
 <label>Quantidade de Mesas no Salão</label>
@@ -209,11 +205,12 @@ th{background:#f0f6f8;font-size:13px}
 </main>
 
 <script>
-// Banco de Dados no LocalStorage
-const DB_PREFIX = "bravobeach_v3_";
+const DB_PREFIX = "bravobeach_v4_";
 let config = JSON.parse(localStorage.getItem(DB_PREFIX + "config") || '{"senha":"240325","qtdMesas":15}');
 let garcons = JSON.parse(localStorage.getItem(DB_PREFIX + "garcons") || '["Carlos","Ana","Bruno"]');
-let produtos = JSON.parse(localStorage.getItem(DB_PREFIX + "produtos") || '[{"id":"1","nome":"Água de Coco","categoria":"sem alcool","preco":10,"estoque":30},{"id":"2","nome":"Caipirinha","categoria":"drinks","preco":22,"estoque":15},{"id":"3","nome":"Isca de Peixe","categoria":"petiscos","preco":65,"estoque":999},{"id":"4","nome":"PF de Frango","categoria":"pratos","preco":38,"estoque":999}]');
+let produtos = JSON.parse(localStorage.getItem(DB_PREFIX + "produtos") || '[{"id":"1","nome":"Água de Coco","categoria":"sem alcool","preco":10,"estoque":4},{"id":"2","nome":"Caipirinha","categoria":"drinks","preco":22,"estoque":12},{"id":"3","nome":"Isca de Peixe","categoria":"petiscos","preco":65,"estoque":999},{"id":"4","nome":"PF de Frango","categoria":"pratos","preco":38,"estoque":999}]');
 let mesasAtivas = JSON.parse(localStorage.getItem(DB_PREFIX + "mesasAtivas") || '{}');
 
 let mesaSelecionadaAtual = null;
+let categoriaMenuAtual = "petiscos";
+

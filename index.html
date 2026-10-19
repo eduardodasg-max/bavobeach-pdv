@@ -4,490 +4,216 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#102d46">
-<title>BravoBeach PDV - Avançado</title>
+<title>BravoBeach PDV · Estoque Integrado</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f0f6f8;color:#102d46;font-family:Arial,sans-serif}
-header{background:#102d46;color:white;padding:15px;display:flex;justify-content:between;align-items:center;flex-wrap:wrap;gap:10px}
-header div{flex:1}
+header{background:#102d46;color:white;padding:22px;display:flex;justify-content:between;align-items:center}
 header h1{margin:0;font-size:24px}
-header p{color:#bfe9e7;margin:5px 0 0}
+header p{color:#bfe9e7;margin:4px 0 0 0;font-size:14px}
 main{max-width:900px;margin:auto;padding:16px}
+nav{display:flex;gap:8px;margin-bottom:14px}
+nav button{flex:1;background:#dcebea;color:#102d46;border:0;padding:12px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:15px}
+nav button.active{background:#13a89e;color:white}
 .card{background:white;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
+h2{margin-top:0;color:#102d46;border-bottom:2px solid #f0f6f8;padding-bottom:8px}
 label{display:block;font-size:13px;font-weight:bold;margin:12px 0 5px}
 input,select,button{width:100%;padding:12px;border-radius:8px;font-size:16px}
-input,select{border:1px solid #dce7eb;background:white}
-button{border:0;background:#13a89e;color:white;font-weight:bold;margin-top:12px;cursor:pointer}
+input,select{border:1px solid #dce7eb;background:white;outline:none}
+input:focus,select:focus{border-color:#13a89e}
+button{border:0;background:#13a89e;color:white;font-weight:bold;cursor:pointer;transition:all 0.2s}
 button:hover{opacity:0.9}
 button.secondary{background:#708492}
-button.danger{background:#d9534f}
-nav{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto}
-nav button{background:#dcebea;color:#102d46;margin-top:0;white-space:nowrap}
-nav button.active{background:#13a89e;color:white}
-.grid-mesas{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;margin-top:15px}
-.mesa-box{background:#e2ebd5;border:2px solid #a3c683;border-radius:10px;padding:20px 10px;text-align:center;font-weight:bold;cursor:pointer;transition:all 0.2s}
-.mesa-box.ocupada{background:#fcdedc;border-color:#f39c94;color:#c0392b}
-.mesa-box:hover{transform:scale(1.03)}
-.flex-group{display:flex;gap:10px;align-items:center}
-.flex-group input,.flex-group select{margin-bottom:0}
-.item-linha{display:flex;justify-content:between;align-items:center;padding:8px 0;border-bottom:1px solid #eee}
-.item-linha:last-child{border-bottom:0}
-.badge{background:#13a89e;color:white;padding:2px 6px;border-radius:4px;font-size:12px}
-.badge.danger{background:#d9534f}
-.lista-cadastros{margin-top:15px;max-height:200px;overflow-y:auto;border:1px solid #eee;border-radius:8px;padding:10px}
-.cadastro-tag{display:flex;justify-content:between;align-items:center;background:#f4f7f9;padding:6px 12px;border-radius:6px;margin-bottom:6px}
-.cadastro-tag button{width:auto;padding:4px 8px;margin-top:0;font-size:12px}
-.popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000}
-.popup-content{background:white;padding:20px;border-radius:12px;max-width:450px;width:90%;max-height:90vh;overflow-y:auto}
-.hidden{display:none !important}
+button.danger{background:#e74c3c}
+
+/* Grid de Mesas */
+.grid-mesas{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;margin-top:14px}
+.mesa-btn{aspect-ratio:1;border:0;border-radius:12px;font-weight:bold;font-size:16px;color:white;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
+.mesa-btn.livre{background:#2ecc71}
+.mesa-btn.ocupada{background:#e74c3c}
+.mesa-btn span{font-size:11px;font-weight:normal;margin-top:4px;opacity:0.9}
+
+/* Layout do Painel de Atendimento */
+.atendimento-container{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.atendimento-container{grid-template-columns:1fr}}
+
+/* Abas de Categorias de Produtos */
+.abas-produtos{display:flex;gap:4px;margin-bottom:10px;background:#f0f6f8;padding:4px;border-radius:8px}
+.aba-cat{padding:8px;font-size:13px;background:none;color:#708492;flex:1;border-radius:6px;margin:0}
+.aba-cat.active{background:white;color:#102d46;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+.grid-produtos-botoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:300px;overflow-y:auto;padding:4px;background:#f9fbfc;border:1px solid #dce7eb;border-radius:8px}
+.prod-item-btn{background:white;border:1px solid #dce7eb;border-radius:8px;padding:10px;text-align:center;height:100%;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
+.prod-item-btn:hover{border-color:#13a89e;background:#f0faf9}
+.prod-item-btn.esgotado{background:#f0f2f5;border-color:#dce7eb;cursor:not-allowed;opacity:0.6}
+.prod-item-btn.esgotado:hover{background:#f0f2f5;border-color:#dce7eb}
+.prod-item-btn strong{font-size:13px;display:block;margin-bottom:4px;color:#102d46}
+.prod-item-btn span{font-size:12px;color:#13a89e;font-weight:bold}
+.prod-item-btn small{font-size:11px;color:#708492;margin-top:4px}
+
+/* Itens da Conta / Consumo */
+.item-consumo{display:flex;justify-content:between;align-items:center;padding:8px 0;border-bottom:1px dashed #dce7eb}
+.item-consumo:last-child{border:0}
+.item-info{flex:1}
+.item-remove{width:auto;padding:4px 8px;font-size:12px;margin:0}
+
+/* Tabelas e Listas */
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #dce7eb}
+th{background:#f0f6f8;font-size:13px}
 </style>
 </head>
 <body>
+
 <header>
 <div>
 <h1>🌊 BravoBeach</h1>
-<p>PDV · Sistema de Mesas & Balcão</p>
+<p>PDV · Gestão de Quiosque & Mesas com Controle de Estoque</p>
 </div>
 </header>
+
 <main>
 <nav>
-<button class="active" data-page="mapa">🗺️ Mapa de Mesas</button>
-<button data-page="config">⚙️ Configurações</button>
+<button id="nav-mapa" class="active" onclick="mudarAba('mapa')">🗺️ Mapa de Mesas</button>
+<button id="nav-config" onclick="mudarAba('config')">⚙️ Configurações</button>
 </nav>
 
-<!-- ABA MAPA DE MESAS -->
-<section id="mapa">
+<!-- ABA 1: MAPA DE MESAS -->
+<section id="sec-mapa">
 <div class="card">
 <h2>Mapa de Mesas</h2>
-<div class="flex-group">
-<input type="number" id="nova-mesa-num" placeholder="Nº da nova mesa" min="1" style="flex:1">
-<button type="button" id="btn-add-mesa" style="width:auto;margin-top:0">Adicionar Mesa</button>
+<div class="grid-mesas" id="container-mesas"></div>
 </div>
-<div class="grid-mesas" id="grid-mesas"></div>
+
+<!-- Janela de Atendimento da Mesa Selecionada -->
+<div id="painel-atendimento" class="card" style="display:none">
+<h2 id="atendimento-titulo">Atendimento - Mesa X</h2>
+<div class="atendimento-container">
+<!-- Lado Esquerdo: Lançamento de Itens -->
+<div>
+<h3>Cardápio (Adicionar Itens)</h3>
+<label>Selecione o Garçom</label>
+<select id="atend-garcom" onchange="atualizarDadosMesa()"></select>
+
+<label>Produtos por Categoria</label>
+<div class="abas-produtos">
+<button class="aba-cat active" id="btn-cat-petiscos" onclick="filtrarProdutosMenu('petiscos')">Petiscos</button>
+<button class="aba-cat" id="btn-cat-drinks" onclick="filtrarProdutosMenu('drinks')">Drinks</button>
+<button class="aba-cat" id="btn-cat-pratos" onclick="filtrarProdutosMenu('pratos')">Pratos</button>
+<button class="aba-cat" id="btn-cat-sem-alcool" onclick="filtrarProdutosMenu('sem alcool')">Sem Álcool</button>
+</div>
+
+<div class="grid-produtos-botoes" id="menu-produtos-botoes">
+<!-- Botões gerados via JS -->
+</div>
+<button type="button" class="danger" style="margin-top:20px" onclick="cancelarMesaInteira()">🚫 Cancelar/Zerar Mesa</button>
+</div>
+
+<!-- Lado Direito: Extrato e Fechamento -->
+<div style="background:#f9fbfc; padding:14px; border-radius:10px; border:1px solid #dce7eb">
+<h3>Consumo Atual</h3>
+<div id="consumo-lista" style="max-height:200px; overflow-y:auto; margin-bottom:12px"></div>
+
+<hr style="border:0; border-top:1px solid #dce7eb; margin:12px 0">
+<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin-bottom:12px">
+<span>Subtotal:</span>
+<span id="atend-subtotal">R$ 0,00</span>
+</div>
+
+<h3>Fechamento de Conta</h3>
+<label>Taxa de Serviço (%)</label>
+<input type="number" id="atend-taxa" value="10" min="0" oninput="calcularTotalFechamento()">
+
+<label>Desconto (R$)</label>
+<input type="number" id="atend-desconto" value="0" min="0" step="0.01" oninput="calcularTotalFechamento()">
+
+<label id="label-motivo">Motivo do Desconto (Obrigatório se houver desconto)</label>
+<input type="text" id="atend-motivo" placeholder="Ex: Cortesia da casa / Erro cozinha">
+
+<label>Forma de Pagamento</label>
+<select id="atend-pagamento">
+<option value="Dinheiro">Dinheiro</option>
+<option value="Pix">Pix</option>
+<option value="Débito">Cartão de Débito</option>
+<option value="Crédito">Cartão de Crédito</option>
+</select>
+
+<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:20px; color:#13a89e; margin:16px 0">
+<span>Total Geral:</span>
+<span id="atend-total">R$ 0,00</span>
+</div>
+
+<button type="button" style="background:#2ecc71" onclick="fecharMesaConta()">💰 Confirmar e Fechar Mesa</button>
+<button type="button" class="secondary" style="margin-top:8px" onclick="fecharPainelAtendimento()">Fechar Painel</button>
+</div>
+</div>
 </div>
 </section>
 
-<!-- ABA CONFIGURAÇÕES -->
-<section id="config" class="hidden">
+<!-- ABA 2: CONFIGURAÇÕES -->
+<section id="sec-config" style="display:none">
+<!-- Senha do Sistema -->
 <div class="card">
 <h2>Segurança</h2>
-<label>Senha do Sistema (Cancelamentos)</label>
-<div class="flex-group">
+<label>Senha Master de Cancelamento</label>
 <input type="password" id="cfg-senha" value="240325">
-<button type="button" id="btn-salvar-senha" style="width:auto;margin-top:0">Alterar Senha</button>
+<button onclick="salvarSenha()" style="margin-top:8px">Salvar Nova Senha</button>
 </div>
-</div>
+
+<!-- Cadastro de Garçons -->
 <div class="card">
-<h2>Cadastro de Garçons</h2>
-<form id="form-garcom" class="flex-group">
-<input type="text" id="cad-garcom-nome" placeholder="Nome do Garçom" required style="flex:1">
-<button type="submit" style="width:auto;margin-top:0">Cadastrar</button>
+<h2>Gerenciar Garçons</h2>
+<form id="form-garcom" onsubmit="event.preventDefault(); cadastrarGarcom();">
+<label>Nome do Garçom</label>
+<input id="new-garcom" required placeholder="Ex: João Silva">
+<button type="submit">Adicionar Garçom</button>
 </form>
-<div class="lista-cadastros" id="lista-garcons"></div>
+<table>
+<thead><tr><th>Nome</th><th>Ações</th></tr></thead>
+<tbody id="tbl-garcons"></tbody>
+</table>
 </div>
+
+<!-- Cadastro de Produtos -->
 <div class="card">
-<h2>Cadastro de Produtos</h2>
-<form id="form-produto">
+<h2>Gerenciar Produtos e Estoque</h2>
+<form id="form-produto" onsubmit="event.preventDefault(); cadastrarProduto();">
 <label>Nome do Produto</label>
-<input type="text" id="cad-prod-nome" placeholder="Ex: Água de Coco" required>
+<input id="new-prod-nome" required placeholder="Ex: Cerveja Long Neck">
+<label>Categoria</label>
+<select id="new-prod-cat">
+<option value="petiscos">Petiscos</option>
+<option value="drinks">Drinks</option>
+<option value="pratos">Pratos</option>
+<option value="sem alcool">Sem Álcool</option>
+</select>
 <label>Preço Unitário (R$)</label>
-<input type="number" id="cad-prod-preco" step="0.01" min="0" placeholder="10.00" required>
-<button type="submit">Cadastrar Produto</button>
+<input id="new-prod-preco" type="number" min="0" step="0.01" required placeholder="12.00">
+<label>Quantidade Inicial em Estoque</label>
+<input id="new-prod-estoque" type="number" min="0" value="50" required placeholder="Ex: 50">
+<button type="submit">Adicionar Produto</button>
 </form>
-<div class="lista-cadastros" id="lista-produtos"></div>
+<table>
+<thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr></thead>
+<tbody id="tbl-produtos"></tbody>
+</table>
+</div>
+
+<!-- Reset de Dados -->
+<div class="card">
+<h2>Configurações do Layout</h2>
+<label>Quantidade de Mesas no Salão</label>
+<input type="number" id="cfg-qtd-mesas" value="15" min="1">
+<button onclick="configurarQuantidadeMesas()" style="margin-top:8px">Atualizar Quantidade de Mesas</button>
 </div>
 </section>
 </main>
 
-<!-- POPUP DETALHES DA MESA -->
-<div id="popup-mesa" class="popup-overlay hidden">
-<div class="popup-content">
-<h2 id="popup-titulo">Mesa X</h2>
-<div id="popup-status-badge"></div>
-<hr>
-<!-- Lançar Itens -->
-<div id="bloco-lancar">
-<h3>Lançar Itens</h3>
-<label>Garçom</label>
-<select id="lancar-garcom"></select>
-<label>Produto</label>
-<select id="lancar-produto"></select>
-<label>Quantidade</label>
-<input type="number" id="lancar-qtd" value="1" min="1">
-<button type="button" id="btn-lancar-item">Adicionar Item</button>
-</div>
-<hr>
-<!-- Consumo Atual -->
-<h3>Consumo da Mesa</h3>
-<div id="popup-consumo"></div>
-<hr>
-<!-- Fechamento -->
-<div id="bloco-fechamento">
-<h3>Fechar Conta</h3>
-<label>Taxa de Serviço (%)</label>
-<input type="number" id="fechar-taxa" value="10" min="0" max="100">
-<label>Desconto (R$)</label>
-<div class="flex-group">
-<input type="number" id="fechar-desconto" value="0" min="0" step="0.01" style="flex:1">
-<input type="text" id="fechar-motivo" placeholder="Motivo do desconto" style="flex:1">
-</div>
-<label>Forma de Pagamento</label>
-<select id="fechar-pagamento">
-<option value="Dinheiro">Dinheiro</option>
-<option value="PIX">PIX</option>
-<option value="Débito">Débito</option>
-<option value="Crédito">Crédito</option>
-</select>
-<div id="popup-totais" style="margin-top:15px; font-weight:bold; font-size:16px;"></div>
-<button type="button" id="btn-fechar-mesa" style="background:#5cb85c">Confirmar e Fechar Mesa</button>
-</div>
-<button type="button" id="btn-cancelar-mesa" class="danger" style="margin-top:15px">Cancelar Mesa Inteira</button>
-<button type="button" onclick="fecharPopup()" class="secondary" style="margin-top:10px">Voltar / Fechar Janela</button>
-</div>
-</div>
-
 <script>
-// Chaves do localStorage
-const KEY_SISTEMA = "bravobeach_sistema_v2";
+// Banco de Dados no LocalStorage
+const DB_PREFIX = "bravobeach_v3_";
+let config = JSON.parse(localStorage.getItem(DB_PREFIX + "config") || '{"senha":"240325","qtdMesas":15}');
+let garcons = JSON.parse(localStorage.getItem(DB_PREFIX + "garcons") || '["Carlos","Ana","Bruno"]');
+let produtos = JSON.parse(localStorage.getItem(DB_PREFIX + "produtos") || '[{"id":"1","nome":"Água de Coco","categoria":"sem alcool","preco":10,"estoque":30},{"id":"2","nome":"Caipirinha","categoria":"drinks","preco":22,"estoque":15},{"id":"3","nome":"Isca de Peixe","categoria":"petiscos","preco":65,"estoque":999},{"id":"4","nome":"PF de Frango","categoria":"pratos","preco":38,"estoque":999}]');
+let mesasAtivas = JSON.parse(localStorage.getItem(DB_PREFIX + "mesasAtivas") || '{}');
 
-// Estado Global padronizado
-let estado = {
-    senha: "240325",
-    garcons: [],
-    produtos: [],
-    mesas: [1,2,3,4,5,6], // Mesas padrão iniciais
-    vendasAtivas: {}, // { mesaNum: { garcom, itens: [ {id, produto, qtd, preco} ] } }
-    historicoFechados: []
-};
-
-// Carrega dados iniciais
-try {
-    const salvo = localStorage.getItem(KEY_SISTEMA);
-    if(salvo) {
-        estado = Object.assign(estado, JSON.parse(salvo));
-    }
-} catch(e) { console.error(e); }
-
-let mesaAbertaAtual = null;
-
-const dinheiro = n => Number(n).toLocaleString("pt-BR", {style: "currency", currency: "BRL"});
-
-function salvar() {
-    localStorage.setItem(KEY_SISTEMA, JSON.stringify(estado));
-    render();
-}
-
-// Navegação entre abas
-document.querySelectorAll("[data-page]").forEach(b => {
-    b.onclick = () => {
-        document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
-        document.getElementById(b.dataset.page).classList.remove("hidden");
-        document.querySelectorAll("nav button").forEach(x => x.classList.remove("active"));
-        b.classList.add("active");
-        render();
-    };
-});
-
-// Render Geral do Sistema
-function render() {
-    // 1. Render do mapa de mesas
-    const grid = document.getElementById("grid-mesas");
-    grid.innerHTML = "";
-    estado.mesas.sort((a,b)=>a-b).forEach(m => {
-        const box = document.createElement("div");
-        const ocupada = !!estado.vendasAtivas[m];
-        box.className = `mesa-box ${ocupada ? 'ocupada' : ''}`;
-        box.innerHTML = `Mesa ${m}<br><small>${ocupada ? 'Ocupada' : 'Livre'}</small>`;
-        box.onclick = () => abrirMesa(m);
-        grid.appendChild(box);
-    });
-
-    // 2. Render da lista de garçons nas configs
-    const lstGarcons = document.getElementById("lista-garcons");
-    lstGarcons.innerHTML = estado.garcons.length ? estado.garcons.map(g => `
-        <div class="cadastro-tag">
-            <span>👤 ${g}</span>
-            <button class="danger" onclick="removerGarcom('${g}')">Excluir</button>
-        </div>
-    `).join("") : "Nenhum garçom cadastrado.";
-
-    // 3. Render da lista de produtos nas configs
-    const lstProds = document.getElementById("lista-produtos");
-    lstProds.innerHTML = estado.produtos.length ? estado.produtos.map(p => `
-        <div class="cadastro-tag">
-            <span>📦 ${p.nome} - ${dinheiro(p.preco)}</span>
-            <button class="danger" onclick="removerProduto('${p.id}')">Excluir</button>
-        </div>
-    `).join("") : "Nenhum produto cadastrado.";
-
-    // Atualiza selects do popup dinamicamente
-    atualizarSelects();
-}
-
-function atualizarSelects() {
-    const selG = document.getElementById("lancar-garcom");
-    selG.innerHTML = estado.garcons.map(g => `<option value="${g}">${g}</option>`).join("") || "<option value=''>Cadastre um garçom</option>";
-
-    const selP = document.getElementById("lancar-produto");
-    selP.innerHTML = estado.produtos.map(p => `<option value="${p.id}">${p.nome} (${dinheiro(p.preco)})</option>`).join("") || "<option value=''>Cadastre um produto</option>";
-}
-
-// Controle de Configurações
-document.getElementById("btn-salvar-senha").onclick = () => {
-    const nSenha = document.getElementById("cfg-senha").value.trim();
-    if(!nSenha) return alert("Digite uma senha válida!");
-    estado.senha = nSenha;
-    salvar();
-    alert("Senha de cancelamento alterada com sucesso!");
-};
-
-document.getElementById("form-garcom").onsubmit = (e) => {
-    e.preventDefault();
-    const nome = document.getElementById("cad-garcom-nome").value.trim();
-    if(!nome || estado.garcons.includes(nome)) return alert("Garçom inválido ou já existente.");
-    estado.garcons.push(nome);
-    document.getElementById("cad-garcom-nome").value = "";
-    salvar();
-};
-
-function removerGarcom(nome) {
-    estado.garcons = estado.garcons.filter(g => g !== nome);
-    salvar();
-}
-
-document.getElementById("form-produto").onsubmit = (e) => {
-    e.preventDefault();
-    const nome = document.getElementById("cad-prod-nome").value.trim();
-    const preco = parseFloat(document.getElementById("cad-prod-preco").value);
-    if(!nome || isNaN(preco) || preco < 0) return alert("Dados do produto inválidos.");
-    estado.produtos.push({ id: String(Date.now()), nome, preco });
-    document.getElementById("cad-prod-nome").value = "";
-    document.getElementById("cad-prod-preco").value = "";
-    salvar();
-};
-
-function removerProduto(id) {
-    estado.produtos = estado.produtos.filter(p => p.id !== id);
-    salvar();
-}
-
-document.getElementById("btn-add-mesa").onclick = () => {
-    const num = parseInt(document.getElementById("nova-mesa-num").value);
-    if(!num || num <= 0) return alert("Digite um número de mesa válido.");
-    if(estado.mesas.includes(num)) return alert("Essa mesa já está no mapa.");
-    estado.mesas.push(num);
-    document.getElementById("nova-mesa-num").value = "";
-    salvar();
-};
-
-// Operações do Popup da Mesa
-function abrirMesa(num) {
-    mesaAbertaAtual = num;
-    document.getElementById("popup-titulo").textContent = `Gestão da Mesa ${num}`;
-    
-    // Reseta campos de fechar
-    document.getElementById("fechar-desconto").value = 0;
-    document.getElementById("fechar-motivo").value = "";
-    document.getElementById("fechar-taxa").value = 10;
-
-    renderPopupMesa();
-    document.getElementById("popup-mesa").classList.remove("hidden");
-}
-
-function fecharPopup() {
-    document.getElementById("popup-mesa").classList.add("hidden");
-    mesaAbertaAtual = null;
-    render();
-}
-
-function renderPopupMesa() {
-    if(!mesaAbertaAtual) return;
-    const conta = estado.vendasAtivas[mesaAbertaAtual];
-    const badge = document.getElementById("popup-status-badge");
-    const consumoDiv = document.getElementById("popup-consumo");
-    
-    if(!conta) {
-        badge.innerHTML = `<span class="badge">LIVRE / SEM CONSUMO</span>`;
-        consumoDiv.innerHTML = "Mesa não possui consumo no momento.";
-        document.getElementById("popup-totais").innerHTML = "";
-    } else {
-        badge.innerHTML = `<span class="badge danger">OCUPADA · Garçom: ${conta.garcom}</span>`;
-        
-        let subtotal = 0;
-        let htmlItens = "";
-        
-        conta.itens.forEach((it, index) => {
-            const totalItem = it.qtd * it.preco;
-            subtotal += totalItem;
-            htmlItens += `
-                <div class="item-linha">
-                    <span>${it.produto} (${it.qtd}x ${dinheiro(it.preco)})</span>
-                    <strong style="margin-left:auto; margin-right:15px;">${dinheiro(totalItem)}</strong>
-                    <button class="danger" style="width:auto; margin-top:0; padding:4px 8px; font-size:12px;" onclick="removerItemMesa(${index})">X</button>
-                </div>
-            `;
-        });
-        
-        consumoDiv.innerHTML = htmlItens || "Nenhum item lançado.";
-        
-        // Calcular totais ao vivo para exibição preliminar
-        atualizarTotaisFechamento(subtotal);
-    }
-}
-
-function atualizarTotaisFechamento(subtotal) {
-    const taxaPorcentagem = parseFloat(document.getElementById("fechar-taxa").value) || 0;
-    const descValor = parseFloat(document.getElementById("fechar-desconto").value) || 0;
-    
-    const valorTaxa = (subtotal * taxaPorcentagem) / 100;
-    const totalGeral = Math.max(0, subtotal + valorTaxa - descValor);
-    
-    document.getElementById("popup-totais").innerHTML = `
-        <div style="display:flex; justify-content:space-between; font-weight:normal; font-size:14px; margin-top:5px;">
-            <span>Subtotal Consumo:</span> <span>${dinheiro(subtotal)}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-weight:normal; font-size:14px;">
-            <span>Taxa Serviço (${taxaPorcentagem}%):</span> <span>${dinheiro(valorTaxa)}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-weight:normal; font-size:14px; color:#d9534f;">
-            <span>Desconto Aplicado:</span> <span>-${dinheiro(descValor)}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-top:8px; border-top:1px solid #ccc; padding-top:5px;">
-            <span>TOTAL GERAL:</span> <span>${dinheiro(totalGeral)}</span>
-        </div>
-    `;
-}
-
-// Vincula listeners para cálculo em tempo real ao alterar campos de fechar
-['fechar-taxa', 'fechar-desconto'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => {
-        const conta = estado.vendasAtivas[mesaAbertaAtual];
-        const subtotal = conta ? conta.itens.reduce((s,i) => s + (i.qtd * i.preco), 0) : 0;
-        atualizarTotaisFechamento(subtotal);
-    });
-});
-
-// Lançar Item na Mesa
-document.getElementById("btn-lancar-item").onclick = () => {
-    if(!mesaAbertaAtual) return;
-    const garcomSel = document.getElementById("lancar-garcom").value;
-    const prodId = document.getElementById("lancar-produto").value;
-    const qtd = parseInt(document.getElementById("lancar-qtd").value) || 1;
-    
-    if(!garcomSel) return alert("Por favor, cadastre e selecione um garçom nas Configurações.");
-    if(!prodId) return alert("Por favor, cadastre e selecione um produto nas Configurações.");
-    
-    const produtoObj = estado.produtos.find(p => p.id === prodId);
-    if(!produtoObj) return alert("Produto não encontrado.");
-    
-    // Se a mesa estiver livre, abre ela automaticamente com o garçom selecionado
-    if(!estado.vendasAtivas[mesaAbertaAtual]) {
-        estado.vendasAtivas[mesaAbertaAtual] = {
-            garcom: garcomSel,
-            itens: []
-        };
-    }
-    
-    estado.vendasAtivas[mesaAbertaAtual].itens.push({
-        id: String(Date.now()) + Math.random(),
-        produto: produtoObj.nome,
-        qtd: qtd,
-        preco: produtoObj.preco
-    });
-    
-    salvar();
-    renderPopupMesa();
-};
-
-// Remover Item Individual da Mesa (Exige Senha)
-function removerItemMesa(index) {
-    const promptSenha = prompt("Ação Restrita! Digite a senha administrativa para cancelar o item:");
-    if(promptSenha === null) return;
-    if(promptSenha !== estado.senha) {
-        alert("Senha incorreta! Cancelamento não autorizado.");
-        return;
-    }
-    
-    const conta = estado.vendasAtivas[mesaAbertaAtual];
-    if(conta && conta.itens[index]) {
-        conta.itens.splice(index, 1);
-        
-        // Se esvaziar todos os itens da mesa, ela pode continuar aberta ou ser resetada
-        if(conta.itens.length === 0) {
-            delete estado.vendasAtivas[mesaAbertaAtual];
-        }
-        salvar();
-        renderPopupMesa();
-        alert("Item cancelado com sucesso!");
-    }
-}
-
-// Cancelar Mesa Inteira (Exige Senha)
-document.getElementById("btn-cancelar-mesa").onclick = () => {
-    if(!mesaAbertaAtual || !estado.vendasAtivas[mesaAbertaAtual]) {
-        return alert("Esta mesa não possui um consumo ativo para cancelar.");
-    }
-    
-    const promptSenha = prompt("Atenção! Você está prestes a CANCELAR TODOS os pedidos desta mesa. Digite a senha de segurança:");
-    if(promptSenha === null) return;
-    if(promptSenha !== estado.senha) {
-        return alert("Senha incorreta! Operação cancelada.");
-    }
-    
-    delete estado.vendasAtivas[mesaAbertaAtual];
-    salvar();
-    fecharPopup();
-    alert(`Mesa ${mesaAbertaAtual} cancelada e liberada com sucesso.`);
-};
-
-// Fechar Conta e Liberar Mesa
-document.getElementById("btn-fechar-mesa").onclick = () => {
-    if(!mesaAbertaAtual) return;
-    const conta = estado.vendasAtivas[mesaAbertaAtual];
-    if(!conta || conta.itens.length === 0) {
-        return alert("Não há itens de consumo lançados nesta mesa para realizar o fechamento.");
-    }
-    
-    const taxaPorcentagem = parseFloat(document.getElementById("fechar-taxa").value) || 0;
-    const descValor = parseFloat(document.getElementById("fechar-desconto").value) || 0;
-    const motivoDesc = document.getElementById("fechar-motivo").value.trim();
-    const formaPgto = document.getElementById("fechar-pagamento").value;
-    
-    // Exigência de motivo para desconto
-    if(descValor > 0 && !motivoDesc) {
-        return alert("Aviso: É obrigatório informar o motivo para concessão de desconto!");
-    }
-    
-    const subtotal = conta.itens.reduce((s, i) => s + (i.qtd * i.preco), 0);
-    const valorTaxa = (subtotal * taxaPorcentagem) / 100;
-    const totalFinal = Math.max(0, subtotal + valorTaxa - descValor);
-    
-    // Adiciona ao histórico de fechamentos salvos
-    estado.historicoFechados.push({
-        id: String(Date.now()),
-        mesa: mesaAbertaAtual,
-        garcom: conta.garcom,
-        itens: conta.itens,
-        subtotal,
-        taxaPorcentagem,
-        valorTaxa,
-        desconto: descValor,
-        motivoDesconto: motivoDesc,
-        totalGeral: totalFinal,
-        formaPagamento: formaPgto,
-        dataFechamento: new Date().toLocaleString("pt-BR")
-    });
-    
-    // Libera a mesa para ficar disponível novamente
-    delete estado.vendasAtivas[mesaAbertaAtual];
-    
-    salvar();
-    fecharPopup();
-    alert("Conta fechada com sucesso! A mesa foi liberada e retornou ao status Disponível.");
-};
-
-// Inicialização
-render();
-</script>
-</body>
-</html>
+let mesaSelecionadaAtual = null;

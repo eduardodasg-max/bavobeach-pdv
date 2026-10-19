@@ -1,5 +1,5 @@
 
-const CACHE = "bavobeach-v4";
+const CACHE = "bavobeach-v5";
 const FILES = [
   "./",
   "./index.html",

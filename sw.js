@@ -9,7 +9,7 @@
 
 // Altere a versão ao publicar uma nova atualização.
 const CACHE_PREFIX = "bavobeach-";
-const CACHE_NAME = "bavobeach-static-v7";
+const CACHE_NAME = "bavobeach-static-v8";
 
 // Arquivos essenciais para iniciar o aplicativo.
 const ARQUIVOS_ESSENCIAIS = [

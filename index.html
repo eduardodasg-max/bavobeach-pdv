@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#102d46">
-<title>BravoBeach PDV · Estoque Crítico</title>
+<title>BravoBeach PDV · Sistema de Mesas Concluído</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f0f6f8;color:#102d46;font-family:Arial,sans-serif}
@@ -69,7 +69,7 @@ th{background:#f0f6f8;font-size:13px}
 <header>
 <div>
 <h1>🌊 BravoBeach</h1>
-<p>PDV · Gestão de Quiosque & Mesas com Controle Crítico</p>
+<p>PDV · Gestão de Quiosque & Mesas Estável</p>
 </div>
 </header>
 
@@ -205,10 +205,10 @@ th{background:#f0f6f8;font-size:13px}
 </main>
 
 <script>
-const DB_PREFIX = "bravobeach_v5_";
+const DB_PREFIX = "bravobeach_v7_";
 let config = JSON.parse(localStorage.getItem(DB_PREFIX + "config") || '{"senha":"240325","qtdMesas":15}');
 let garcons = JSON.parse(localStorage.getItem(DB_PREFIX + "garcons") || '["Carlos","Ana","Bruno"]');
-let produtos = JSON.parse(localStorage.getItem(DB_PREFIX + "produtos") || '[{"id":"1","nome":"Água de Coco","categoria":"sem alcool","preco":10,"estoque":4},{"id":"2","nome":"Caipirinha","categoria":"drinks","preco":22,"estoque":12},{"id":"3","nome":"Isca de Peixe","categoria":"petiscos","preco":65,"estoque":999},{"id":"4","nome":"PF de Frango","categoria":"pratos","preco":38,"estoque":999}]');
+let produtos = JSON.parse(localStorage.getItem(DB_PREFIX + "produtos") || '[{"id":"prod_1","nome":"Água de Coco","categoria":"sem alcool","preco":10,"estoque":4},{"id":"prod_2","nome":"Caipirinha","categoria":"drinks","preco":22,"estoque":12},{"id":"prod_3","nome":"Isca de Peixe","categoria":"petiscos","preco":65,"estoque":999},{"id":"prod_4","nome":"PF de Frango","categoria":"pratos","preco":38,"estoque":999}]');
 let mesasAtivas = JSON.parse(localStorage.getItem(DB_PREFIX + "mesasAtivas") || '{}');
 
 let mesaSelecionadaAtual = null;

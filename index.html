@@ -1,216 +1,141 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#102d46">
-<title>BravoBeach PDV · Sistema de Mesas Concluído</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#f0f6f8;color:#102d46;font-family:Arial,sans-serif}
-header{background:#102d46;color:white;padding:22px}
-header h1{margin:0;font-size:24px}
-header p{color:#bfe9e7;margin:4px 0 0 0;font-size:14px}
-main{max-width:900px;margin:auto;padding:16px}
-nav{display:flex;gap:8px;margin-bottom:14px}
-nav button{flex:1;background:#dcebea;color:#102d46;border:0;padding:12px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:15px}
-nav button.active{background:#13a89e;color:white}
-.card{background:white;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
-h2{margin-top:0;color:#102d46;border-bottom:2px solid #f0f6f8;padding-bottom:8px}
-label{display:block;font-size:13px;font-weight:bold;margin:12px 0 5px}
-input,select,button{width:100%;padding:12px;border-radius:8px;font-size:16px}
-input,select{border:1px solid #dce7eb;background:white;outline:none}
-input:focus,select:focus{border-color:#13a89e}
-button{border:0;background:#13a89e;color:white;font-weight:bold;cursor:pointer;transition:all 0.2s}
-button:hover{opacity:0.9}
-button.secondary{background:#708492}
-button.danger{background:#e74c3c}
+const express = require('express');
+const app = express();
+app.use(express.json());
 
-/* Grid de Mesas */
-.grid-mesas{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;margin-top:14px}
-.mesa-btn{aspect-ratio:1;border:0;border-radius:12px;font-weight:bold;font-size:16px;color:white;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
-.mesa-btn.livre{background:#2ecc71}
-.mesa-btn.ocupada{background:#e74c3c}
-.mesa-btn span{font-size:11px;font-weight:normal;margin-top:4px;opacity:0.9}
+// Banco de dados em memória (Substitua por PostgreSQL/MongoDB em produção)
+let estoque = {
+    "1": { id: "1", nome: "Cerveja Duplo Malte", tipo: "bebida", preco: 12.00, qtd: 50 },
+    "2": { id: "2", nome: "Batata Frita c/ Queijo", tipo: "petisco", preco: 35.00, qtd: 20 },
+    "3": { id: "3", nome: "Filé à Parmegiana", tipo: "prato", preco: 65.00, qtd: 15 }
+};
 
-/* Layout do Painel de Atendimento */
-.atendimento-container{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:768px){.atendimento-container{grid-template-columns:1fr}}
+let mesas = {};
+const TOTAL_MESAS = 15;
 
-/* Abas de Categorias de Produtos */
-.abas-produtos{display:flex;gap:4px;margin-bottom:10px;background:#f0f6f8;padding:4px;border-radius:8px}
-.aba-cat{padding:8px;font-size:13px;background:none;color:#708492;flex:1;border-radius:6px;margin:0;border:0;cursor:pointer;font-weight:bold}
-.aba-cat.active{background:white;color:#102d46;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
-.grid-produtos-botoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:300px;overflow-y:auto;padding:4px;background:#f9fbfc;border:1px solid #dce7eb;border-radius:8px}
-.prod-item-btn{background:white;border:1px solid #dce7eb;border-radius:8px;padding:10px;text-align:center;height:100%;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
-.prod-item-btn:hover{border-color:#13a89e;background:#f0faf9}
-.prod-item-btn.esgotado{background:#f0f2f5;border-color:#dce7eb;cursor:not-allowed;opacity:0.6}
-.prod-item-btn.esgotado:hover{background:#f0f2f5;border-color:#dce7eb}
-.prod-item-btn strong{font-size:13px;display:block;margin-bottom:4px;color:#102d46}
-.prod-item-btn span{font-size:12px;color:#13a89e;font-weight:bold}
-.prod-item-btn small{font-size:11px;color:#708492;margin-top:4px;font-weight:bold;padding:2px 4px;border-radius:4px}
-.prod-item-btn small.critico{background:#ffeaa7;color:#d63031}
-.prod-item-btn small.normal{color:#708492}
+// Inicializa o mapa de mesas livres
+for (let i = 1; i <= TOTAL_MESAS; i++) {
+    mesas[i] = { numero: i, aberta: false, itens: [], taxaServicoPadrao: 10, desconto: 0 };
+}
 
-/* Itens da Conta / Consumo */
-.item-consumo{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed #dce7eb}
-.item-consumo:last-child{border:0}
-.item-info{flex:1}
-.item-remove{width:auto;padding:4px 8px;font-size:12px;margin:0}
+// === ROTAS DE PRODUTOS E ESTOQUE ===
+app.get('/produtos', (req, res) => {
+    res.json(Object.values(estoque));
+});
 
-/* Tabelas e Listas */
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{text-align:left;padding:10px;border-bottom:1px solid #dce7eb}
-th{background:#f0f6f8;font-size:13px}
-</style>
-</head>
-<body>
+// === ROTAS DO MAPA DE MESAS ===
+app.get('/mesas', (req, res) => {
+    res.json(Object.values(mesas));
+});
 
-<header>
-<div>
-<h1>🌊 BravoBeach</h1>
-<p>PDV · Gestão de Quiosque & Mesas Estável</p>
-</div>
-</header>
+// Abrir ou lançar item na mesa (Mantém aberta e disponível)
+app.post('/mesas/:numero/lancar', (req, res) => {
+    const { numero } = req.params;
+    const { produtoId, quantidade } = req.body;
 
-<main>
-<nav>
-<button id="nav-mapa" class="active" onclick="mudarAba('mapa')">🗺️ Mapa de Mesas</button>
-<button id="nav-config" onclick="mudarAba('config')">⚙️ Configurações</button>
-</nav>
+    const mesa = mesas[numero];
+    if (!mesa) return res.status(404).json({ error: "Mesa não encontrada." });
 
-<!-- ABA 1: MAPA DE MESAS -->
-<section id="sec-mapa">
-<div class="card">
-<h2>Mapa de Mesas</h2>
-<div class="grid-mesas" id="container-mesas"></div>
-</div>
+    const produto = estoque[produtoId];
+    if (!produto) return res.status(404).json({ error: "Produto não encontrado." });
 
-<!-- Janela de Atendimento da Mesa Selecionada -->
-<div id="painel-atendimento" class="card" style="display:none">
-<h2 id="atendimento-titulo">Atendimento - Mesa X</h2>
-<div class="atendimento-container">
-<!-- Lado Esquerdo: Lançamento de Itens -->
-<div>
-<h3>Cardápio (Adicionar Itens)</h3>
-<label>Selecione o Garçom</label>
-<select id="atend-garcom" onchange="atualizarDadosMesa()"></select>
+    // Validação rigorosa de estoque para evitar falhas
+    if (produto.qtd < quantidade) {
+        return res.status(400).json({ error: `Estoque insuficiente. Disponível: ${produto.qtd}` });
+    }
 
-<label>Produtos por Categoria</label>
-<div class="abas-produtos">
-<button class="aba-cat active" id="btn-cat-petiscos" onclick="filtrarProdutosMenu('petiscos')">Petiscos</button>
-<button class="aba-cat" id="btn-cat-drinks" onclick="filtrarProdutosMenu('drinks')">Drinks</button>
-<button class="aba-cat" id="btn-cat-pratos" onclick="filtrarProdutosMenu('pratos')">Pratos</button>
-<button class="aba-cat" id="btn-cat-sem-alcool" onclick="filtrarProdutosMenu('sem alcool')">Sem Álcool</button>
-</div>
+    // Deduz do estoque imediatamente
+    produto.qtd -= quantidade;
 
-<div class="grid-produtos-botoes" id="menu-produtos-botoes"></div>
-<button type="button" class="danger" style="margin-top:20px" onclick="cancelarMesaInteira()">🚫 Cancelar/Zerar Mesa</button>
-</div>
+    // Se a mesa estava fechada, ela abre agora
+    if (!mesa.aberta) {
+        mesa.aberta = true;
+        mesa.itens = [];
+        mesa.desconto = 0;
+        mesa.taxaServicoPadrao = 10; 
+    }
 
-<!-- Lado Direito: Extrato e Fechamento -->
-<div style="background:#f9fbfc; padding:14px; border-radius:10px; border:1px solid #dce7eb">
-<h3>Consumo Atual</h3>
-<div id="consumo-lista" style="max-height:200px; overflow-y:auto; margin-bottom:12px"></div>
+    // Adiciona o item à mesa
+    const itemExistente = mesa.itens.find(i => i.produtoId === produtoId);
+    if (itemExistente) {
+        itemExistente.quantidade += quantidade;
+    } else {
+        mesa.itens.push({
+            produtoId,
+            nome: produto.nome,
+            precoUnitario: produto.preco,
+            quantidade
+        });
+    }
 
-<hr style="border:0; border-top:1px solid #dce7eb; margin:12px 0">
-<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin-bottom:12px">
-<span>Subtotal:</span>
-<span id="atend-subtotal">R$ 0,00</span>
-</div>
+    res.json({ message: "Item lançado com sucesso!", mesa });
+});
 
-<h3>Fechamento de Conta</h3>
-<label>Taxa de Serviço (%)</label>
-<input type="number" id="atend-taxa" value="10" min="0" oninput="calcularTotalFechamento()">
+// Cancelamento de Item (Estorno de estoque)
+app.post('/mesas/:numero/cancelar-item', (req, res) => {
+    const { numero } = req.params;
+    const { produtoId, quantidade } = req.body;
 
-<label>Desconto (R$)</label>
-<input type="number" id="atend-desconto" value="0" min="0" step="0.01" oninput="calcularTotalFechamento()">
+    const mesa = mesas[numero];
+    if (!mesa || !mesa.aberta) return res.status(400).json({ error: "Mesa não está ativa." });
 
-<label id="label-motivo">Motivo do Desconto (Obrigatório se houver desconto)</label>
-<input type="text" id="atend-motivo" placeholder="Ex: Cortesia da casa / Erro cozinha">
+    const item = mesa.itens.find(i => i.produtoId === produtoId);
+    if (!item || item.quantidade < quantidade) {
+        return res.status(400).json({ error: "Quantidade de cancelamento inválida." });
+    }
 
-<label>Forma de Pagamento</label>
-<select id="atend-pagamento">
-<option value="Dinheiro">Dinheiro</option>
-<option value="Pix">Pix</option>
-<option value="Débito">Cartão de Débito</option>
-<option value="Crédito">Cartão de Crédito</option>
-</select>
+    // Estorna ao estoque
+    item.quantidade -= quantity;
+    estoque[produtoId].qtd += quantidade;
 
-<div style="display:flex; justify-content:space-between; font-weight:bold; font-size:20px; color:#13a89e; margin:16px 0">
-<span>Total Geral:</span>
-<span id="atend-total">R$ 0,00</span>
-</div>
+    // Limpa o item se a quantidade zerar
+    if (item.quantidade === 0) {
+        mesa.itens = mesa.itens.filter(i => i.produtoId !== produtoId);
+    }
 
-<button type="button" style="background:#2ecc71" onclick="fecharMesaConta()">💰 Confirmar e Fechar Mesa</button>
-<button type="button" class="secondary" style="margin-top:8px" onclick="fecharPainelAtendimento()">Fechar Painel</button>
-</div>
-</div>
-</div>
-</section>
+    res.json({ message: "Item cancelado e estoque estornado.", mesa });
+});
 
-<!-- ABA 2: CONFIGURAÇÕES -->
-<section id="sec-config" style="display:none">
-<div class="card">
-<h2>Segurança</h2>
-<label>Senha Master de Cancelamento</label>
-<input type="password" id="cfg-senha" value="240325">
-<button onclick="salvarSenha()" style="margin-top:8px">Salvar Nova Senha</button>
-</div>
+// Atualizar taxas e descontos editáveis da mesa
+app.put('/mesas/:numero/configurar-valores', (req, res) => {
+    const { numero } = req.params;
+    const { taxaServico, desconto } = req.body;
 
-<div class="card">
-<h2>Gerenciar Garçons</h2>
-<form id="form-garcom" onsubmit="cadastrarGarcom(event)">
-<label>Nome do Garçom</label>
-<input id="new-garcom" required placeholder="Ex: João Silva">
-<button type="submit">Adicionar Garçom</button>
-</form>
-<table>
-<thead><tr><th>Nome</th><th>Ações</th></tr></thead>
-<tbody id="tbl-garcons"></tbody>
-</table>
-</div>
+    const mesa = mesas[numero];
+    if (!mesa || !mesa.aberta) return res.status(400).json({ error: "Mesa não ativa." });
 
-<div class="card">
-<h2>Gerenciar Produtos e Estoque</h2>
-<form id="form-produto" onsubmit="cadastrarProduto(event)">
-<label>Nome do Produto</label>
-<input id="new-prod-nome" required placeholder="Ex: Cerveja Long Neck">
-<label>Categoria</label>
-<select id="new-prod-cat">
-<option value="petiscos">Petiscos</option>
-<option value="drinks">Drinks</option>
-<option value="pratos">Pratos</option>
-<option value="sem alcool">Sem Álcool</option>
-</select>
-<label>Preço Unitário (R$)</label>
-<input id="new-prod-preco" type="number" min="0" step="0.01" required placeholder="12.00">
-<label>Quantidade Inicial em Estoque</label>
-<input id="new-prod-estoque" type="number" min="0" value="50" required>
-<button type="submit">Adicionar Produto</button>
-</form>
-<table>
-<thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr></thead>
-<tbody id="tbl-produtos"></tbody>
-</table>
-</div>
+    if (taxaServico !== undefined) mesa.taxaServicoPadrao = taxaServico;
+    if (desconto !== undefined) mesa.desconto = desconto;
 
-<div class="card">
-<h2>Configurações do Layout</h2>
-<label>Quantidade de Mesas no Salão</label>
-<input type="number" id="cfg-qtd-mesas" value="15" min="1">
-<button onclick="configurarQuantidadeMesas()" style="margin-top:8px">Atualizar Quantidade de Mesas</button>
-</div>
-</section>
-</main>
+    res.json({ message: "Valores atualizados com sucesso.", mesa });
+});
 
-<script>
-const DB_PREFIX = "bravobeach_v7_";
-let config = JSON.parse(localStorage.getItem(DB_PREFIX + "config") || '{"senha":"240325","qtdMesas":15}');
-let garcons = JSON.parse(localStorage.getItem(DB_PREFIX + "garcons") || '["Carlos","Ana","Bruno"]');
-let produtos = JSON.parse(localStorage.getItem(DB_PREFIX + "produtos") || '[{"id":"prod_1","nome":"Água de Coco","categoria":"sem alcool","preco":10,"estoque":4},{"id":"prod_2","nome":"Caipirinha","categoria":"drinks","preco":22,"estoque":12},{"id":"prod_3","nome":"Isca de Peixe","categoria":"petiscos","preco":65,"estoque":999},{"id":"prod_4","nome":"PF de Frango","categoria":"pratos","preco":38,"estoque":999}]');
-let mesasAtivas = JSON.parse(localStorage.getItem(DB_PREFIX + "mesasAtivas") || '{}');
+// Fechamento e Encerramento da Mesa
+app.post('/mesas/:numero/fechar', (req, res) => {
+    const { numero } = req.params;
+    const mesa = mesas[numero];
 
-let mesaSelecionadaAtual = null;
-let categoriaMenuAtual = "petiscos";
+    if (!mesa || !mesa.aberta) return res.status(400).json({ error: "Mesa já está fechada ou não existe." });
 
+    // Cálculo dos totais
+    const subtotal = mesa.itens.reduce((acc, item) => acc + (item.precoUnitario * item.quantidade), 0);
+    const valorTaxa = subtotal * (mesa.taxaServicoPadrao / 100);
+    const totalFinal = Math.max(0, subtotal + valorTaxa - mesa.desconto);
+
+    const resumoFechamento = {
+        numeroMesa: mesa.numero,
+        itens: mesa.itens,
+        subtotal,
+        taxaServico: `${mesa.taxaServicoPadrao}% (${valorTaxa.toFixed(2)})`,
+        desconto: mesa.desconto,
+        total: totalFinal
+    };
+
+    // Reseta a mesa para o estado Livre
+    mesa.aberta = false;
+    mesa.itens = [];
+    mesa.desconto = 0;
+
+    res.json({ message: "Mesa encerrada com sucesso!", cupomFiscal: resumoFechamento });
+});
+
+app.listen(3000, () => console.log("Servidor PDV rodando na porta 3000"));

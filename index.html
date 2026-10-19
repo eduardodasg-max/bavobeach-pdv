@@ -8,7 +8,7 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#f0f6f8;color:#102d46;font-family:Arial,sans-serif}
-header{background:#102d46;color:white;padding:22px;display:flex;justify-content:between;align-items:center}
+header{background:#102d46;color:white;padding:22px}
 header h1{margin:0;font-size:24px}
 header p{color:#bfe9e7;margin:4px 0 0 0;font-size:14px}
 main{max-width:900px;margin:auto;padding:16px}
@@ -39,7 +39,7 @@ button.danger{background:#e74c3c}
 
 /* Abas de Categorias de Produtos */
 .abas-produtos{display:flex;gap:4px;margin-bottom:10px;background:#f0f6f8;padding:4px;border-radius:8px}
-.aba-cat{padding:8px;font-size:13px;background:none;color:#708492;flex:1;border-radius:6px;margin:0}
+.aba-cat{padding:8px;font-size:13px;background:none;color:#708492;flex:1;border-radius:6px;margin:0;border:0;cursor:pointer;font-weight:bold}
 .aba-cat.active{background:white;color:#102d46;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
 .grid-produtos-botoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:300px;overflow-y:auto;padding:4px;background:#f9fbfc;border:1px solid #dce7eb;border-radius:8px}
 .prod-item-btn{background:white;border:1px solid #dce7eb;border-radius:8px;padding:10px;text-align:center;height:100%;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
@@ -53,7 +53,7 @@ button.danger{background:#e74c3c}
 .prod-item-btn small.normal{color:#708492}
 
 /* Itens da Conta / Consumo */
-.item-consumo{display:flex;justify-content:between;align-items:center;padding:8px 0;border-bottom:1px dashed #dce7eb}
+.item-consumo{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed #dce7eb}
 .item-consumo:last-child{border:0}
 .item-info{flex:1}
 .item-remove{width:auto;padding:4px 8px;font-size:12px;margin:0}
@@ -160,7 +160,7 @@ th{background:#f0f6f8;font-size:13px}
 
 <div class="card">
 <h2>Gerenciar Garçons</h2>
-<form id="form-garcom" onsubmit="event.preventDefault(); cadastrarGarcom();">
+<form id="form-garcom" onsubmit="cadastrarGarcom(event)">
 <label>Nome do Garçom</label>
 <input id="new-garcom" required placeholder="Ex: João Silva">
 <button type="submit">Adicionar Garçom</button>
@@ -173,7 +173,7 @@ th{background:#f0f6f8;font-size:13px}
 
 <div class="card">
 <h2>Gerenciar Produtos e Estoque</h2>
-<form id="form-produto" onsubmit="event.preventDefault(); cadastrarProduto();">
+<form id="form-produto" onsubmit="cadastrarProduto(event)">
 <label>Nome do Produto</label>
 <input id="new-prod-nome" required placeholder="Ex: Cerveja Long Neck">
 <label>Categoria</label>
@@ -205,7 +205,7 @@ th{background:#f0f6f8;font-size:13px}
 </main>
 
 <script>
-const DB_PREFIX = "bravobeach_v4_";
+const DB_PREFIX = "bravobeach_v5_";
 let config = JSON.parse(localStorage.getItem(DB_PREFIX + "config") || '{"senha":"240325","qtdMesas":15}');
 let garcons = JSON.parse(localStorage.getItem(DB_PREFIX + "garcons") || '["Carlos","Ana","Bruno"]');
 let produtos = JSON.parse(localStorage.getItem(DB_PREFIX + "produtos") || '[{"id":"1","nome":"Água de Coco","categoria":"sem alcool","preco":10,"estoque":4},{"id":"2","nome":"Caipirinha","categoria":"drinks","preco":22,"estoque":12},{"id":"3","nome":"Isca de Peixe","categoria":"petiscos","preco":65,"estoque":999},{"id":"4","nome":"PF de Frango","categoria":"pratos","preco":38,"estoque":999}]');
